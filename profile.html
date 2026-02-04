@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الملف الشخصي - Parking Point</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background-color: #19223A;
+            font-family: 'Cairo', sans-serif;
+            color: #FFFFFF;
+            min-height: 100vh;
+        }
+        
+        .header {
+            background-color: #0F1820;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #FFD600;
+        }
+        
+        .header h1 {
+            color: #FFD600;
+            font-size: 24px;
+        }
+        
+        .back-btn {
+            background-color: #FFD600;
+            color: #19223A;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .back-btn:hover {
+            background-color: #FFF000;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+        
+        .profile-section {
+            background-color: #0F1820;
+            border: 1px solid #1A4A8A;
+            border-radius: 12px;
+            padding: 32px;
+            margin-bottom: 32px;
+            display: flex;
+            gap: 32px;
+            align-items: center;
+        }
+        
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(135deg, #FFD600, #1A4A8A);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 60px;
+            flex-shrink: 0;
+        }
+        
+        .profile-info h2 {
+            color: #FFD600;
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+        
+        .profile-info p {
+            color: #F3F4F6;
+            margin-bottom: 4px;
+            font-size: 14px;
+        }
+        
+        .edit-btn {
+            background-color: #1A4A8A;
+            color: #FFD600;
+            border: 1px solid #FFD600;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 16px;
+            transition: all 0.3s ease;
+        }
+        
+        .edit-btn:hover {
+            background-color: #FFD600;
+            color: #19223A;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+        
+        .stat-card {
+            background-color: #0F1820;
+            border: 1px solid #1A4A8A;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 32px;
+            color: #FFD600;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+        
+        .stat-label {
+            color: #F3F4F6;
+            font-size: 14px;
+        }
+        
+        .section-title {
+            color: #FFD600;
+            font-size: 20px;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #1A4A8A;
+        }
+        
+        .booking-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+        
+        .booking-item {
+            background-color: #0F1820;
+            border: 1px solid #1A4A8A;
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+        
+        .booking-item:hover {
+            border-color: #FFD600;
+            background-color: #1A2E47;
+        }
+        
+        .booking-details h3 {
+            color: #FFD600;
+            margin-bottom: 8px;
+            font-size: 16px;
+        }
+        
+        .booking-details p {
+            color: #F3F4F6;
+            font-size: 13px;
+            margin-bottom: 4px;
+        }
+        
+        .booking-status {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            display: inline-block;
+        }
+        
+        .booking-status.active {
+            background-color: #10B981;
+            color: #FFFFFF;
+        }
+        
+        .booking-status.completed {
+            background-color: #6B7280;
+            color: #FFFFFF;
+        }
+        
+        .booking-status.cancelled {
+            background-color: #EF4444;
+            color: #FFFFFF;
+        }
+        
+        .payment-section {
+            background-color: #0F1820;
+            border: 1px solid #1A4A8A;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 32px;
+        }
+        
+        .payment-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #1A4A8A;
+        }
+        
+        .payment-row:last-child {
+            border-bottom: none;
+        }
+        
+        .payment-label {
+            color: #F3F4F6;
+            font-size: 14px;
+        }
+        
+        .payment-value {
+            color: #FFD600;
+            font-weight: bold;
+        }
+        
+        .settings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+        }
+        
+        .setting-card {
+            background-color: #0F1820;
+            border: 1px solid #1A4A8A;
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .setting-card:hover {
+            border-color: #FFD600;
+        }
+        
+        .setting-label {
+            color: #FFD600;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .logout-btn {
+            background-color: #EF4444;
+            color: #FFFFFF;
+            border: none;
+            padding: 12px 32px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 16px;
+            width: 100%;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .logout-btn:hover {
+            background-color: #DC2626;
+        }
+        
+        @media (max-width: 768px) {
+            .profile-section {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .booking-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>👤 الملف الشخصي</h1>
+        <a href="index.html" class="back-btn">← العودة</a>
+    </div>
+    
+    <div class="container">
+        <!-- قسم البيانات الشخصية -->
+        <div class="profile-section">
+            <div class="profile-avatar">👨</div>
+            <div class="profile-info">
+                <h2>محمد علي</h2>
+                <p>📱 الهاتف: +966 50 123 4567</p>
+                <p>✉️ البريد: mohammad@example.com</p>
+                <p>🆔 رقم اللوحة: 1234 أ ب ج</p>
+                <p>📅 تاريخ الانضمام: 15 ديسمبر 2024</p>
+                <button class="edit-btn">تعديل البيانات ✏️</button>
+            </div>
+        </div>
+        
+        <!-- الإحصائيات -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number">24</div>
+                <div class="stat-label">عدد الحجوزات</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">156</div>
+                <div class="stat-label">ساعات مجموع</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">4.8/5</div>
+                <div class="stat-label">التقييم</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">485</div>
+                <div class="stat-label">النقاط</div>
+            </div>
+        </div>
+        
+        <!-- الحجوزات السابقة -->
+        <h2 class="section-title">الحجوزات السابقة</h2>
+        <div class="booking-list">
+            <div class="booking-item">
+                <div class="booking-details">
+                    <h3>🏢 الشركة الرئيسية</h3>
+                    <p>📅 أمس - 10:00 صباحًا إلى 2:00 مساءً</p>
+                    <p>💰 السعر: 20 ريال</p>
+                </div>
+                <span class="booking-status completed">✓ مكتمل</span>
+            </div>
+            
+            <div class="booking-item">
+                <div class="booking-details">
+                    <h3>🏪 المجمع التجاري</h3>
+                    <p>📅 الجمعة - 3:30 مساءً إلى 6:30 مساءً</p>
+                    <p>💰 السعر: 18 ريال</p>
+                </div>
+                <span class="booking-status completed">✓ مكتمل</span>
+            </div>
+            
+            <div class="booking-item">
+                <div class="booking-details">
+                    <h3>🏢 الفرع الثاني</h3>
+                    <p>📅 غدًا - 9:00 صباحًا إلى 1:00 ظهرًا</p>
+                    <p>💰 السعر: 16 ريال</p>
+                </div>
+                <span class="booking-status active">🟢 نشط</span>
+            </div>
+        </div>
+        
+        <!-- ملخص الدفع -->
+        <h2 class="section-title">ملخص الدفع</h2>
+        <div class="payment-section">
+            <div class="payment-row">
+                <span class="payment-label">الرصيد الحالي:</span>
+                <span class="payment-value">250 ريال</span>
+            </div>
+            <div class="payment-row">
+                <span class="payment-label">المصروفات هذا الشهر:</span>
+                <span class="payment-value">145 ريال</span>
+            </div>
+            <div class="payment-row">
+                <span class="payment-label">الخصومات المرتقبة:</span>
+                <span class="payment-value">25 ريال</span>
+            </div>
+            <div class="payment-row">
+                <span class="payment-label">النقاط المتراكمة:</span>
+                <span class="payment-value">485 نقطة</span>
+            </div>
+        </div>
+        
+        <!-- الإعدادات -->
+        <h2 class="section-title">الإعدادات</h2>
+        <div class="settings-grid">
+            <div class="setting-card">
+                <span class="setting-label">🔔 الإشعارات</span>
+                <span style="color: #10B981; font-weight: bold;">مفعّل</span>
+            </div>
+            <div class="setting-card">
+                <span class="setting-label">🌙 الوضع الليلي</span>
+                <span style="color: #FFFFFF; font-weight: bold;">مفعّل</span>
+            </div>
+            <div class="setting-card">
+                <span class="setting-label">🔐 الخصوصية</span>
+                <span style="color: #10B981; font-weight: bold;">محمي</span>
+            </div>
+            <div class="setting-card">
+                <span class="setting-label">📧 النشرة البريدية</span>
+                <span style="color: #10B981; font-weight: bold;">مفعّل</span>
+            </div>
+        </div>
+        
+        <button class="logout-btn" onclick="alert('تم تسجيل الخروج بنجاح!')">تسجيل الخروج</button>
+    </div>
+</body>
+</html>

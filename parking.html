@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>خريطة المواقف - Parking Point</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background-color: #19223A;
+            font-family: 'Cairo', 'Segoe UI', Arial, sans-serif;
+            color: #FFFFFF;
+            min-height: 100vh;
+        }
+        
+        .header {
+            background-color: #0F1820;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #FFD600;
+        }
+        
+        .header h1 {
+            color: #FFD600;
+            font-size: 24px;
+        }
+        
+        .back-btn {
+            background-color: #FFD600;
+            color: #19223A;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .back-btn:hover {
+            background-color: #FFF000;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+        
+        .search-bar {
+            margin-bottom: 32px;
+        }
+        
+        .search-bar input {
+            width: 100%;
+            padding: 14px;
+            background-color: #0F1820;
+            border: 1px solid #1A4A8A;
+            border-radius: 8px;
+            color: #FFFFFF;
+            font-size: 16px;
+            font-family: 'Segoe UI', sans-serif;
+        }
+        
+        .search-bar input::placeholder {
+            color: #F3F4F6;
+        }
+        
+        .search-bar input:focus {
+            outline: none;
+            border-color: #FFD600;
+            box-shadow: 0 0 8px rgba(255, 214, 0, 0.2);
+        }
+        
+        .parking-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+        
+        .parking-card {
+            background-color: #0F1820;
+            border: 2px solid #1A4A8A;
+            border-radius: 12px;
+            padding: 24px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .parking-card:hover {
+            border-color: #FFD600;
+            box-shadow: 0 4px 12px rgba(255, 214, 0, 0.15);
+            transform: translateY(-4px);
+        }
+        
+        .parking-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 16px;
+        }
+        
+        .parking-card h3 {
+            color: #FFD600;
+            font-size: 18px;
+        }
+        
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            display: inline-block;
+        }
+        
+        .status-badge.available {
+            background-color: #10B981;
+            color: #FFFFFF;
+        }
+        
+        .status-badge.limited {
+            background-color: #F59E0B;
+            color: #19223A;
+        }
+        
+        .status-badge.full {
+            background-color: #EF4444;
+            color: #FFFFFF;
+        }
+        
+        .parking-info {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin: 16px 0;
+            padding: 12px;
+            background-color: #19223A;
+            border-radius: 8px;
+        }
+        
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .info-row span {
+            color: #F3F4F6;
+            font-size: 14px;
+        }
+        
+        .info-row strong {
+            color: #FFD600;
+        }
+        
+        .availability-bar {
+            background-color: #1A4A8A;
+            height: 24px;
+            border-radius: 12px;
+            overflow: hidden;
+            margin: 12px 0;
+        }
+        
+        .availability-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #10B981, #FFD600);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #FFFFFF;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .book-btn {
+            width: 100%;
+            padding: 12px;
+            background-color: #FFD600;
+            color: #19223A;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            margin-top: 16px;
+        }
+        
+        .book-btn:hover {
+            background-color: #FFF000;
+            transform: translateY(-2px);
+        }
+        
+        .distance {
+            color: #1A4A8A;
+            font-size: 12px;
+            margin-top: 8px;
+        }
+        
+        @media (max-width: 768px) {
+            .parking-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🗺️ خريطة المواقف</h1>
+        <a href="index.html" class="back-btn">← العودة</a>
+    </div>
+    
+    <div class="container">
+        <div class="search-bar">
+            <input type="text" placeholder="ابحث عن موقف أو موقع...">
+        </div>
+        
+        <div class="parking-grid">
+            <!-- الشركة الرئيسية -->
+            <div class="parking-card">
+                <div class="parking-card-header">
+                    <h3>🏢 الشركة الرئيسية</h3>
+                    <span class="status-badge available">متاح</span>
+                </div>
+                
+                <div class="parking-info">
+                    <div class="info-row">
+                        <span>المواقف المتاحة:</span>
+                        <strong>12 / 20</strong>
+                    </div>
+                    <div class="info-row">
+                        <span>السعر بالساعة:</span>
+                        <strong>5 ريال</strong>
+                    </div>
+                    <div class="info-row">
+                        <span>المسافة:</span>
+                        <strong>2.5 كم</strong>
+                    </div>
+                </div>
+                
+                <div class="availability-bar">
+                    <div class="availability-fill" style="width: 60%;">60%</div>
+                </div>
+                
+                <div class="distance">📍 الموقع: شارع النيل - الرياض</div>
+                
+                <button class="book-btn" onclick="location.href='booking.html'">احجز الآن</button>
+            </div>
+            
+            <!-- المجمع التجاري -->
+            <div class="parking-card">
+                <div class="parking-card-header">
+                    <h3>🏪 المجمع التجاري</h3>
+                    <span class="status-badge limited">محدود</span>
+                </div>
+                
+                <div class="parking-info">
+                    <div class="info-row">
+                        <span>المواقف المتاحة:</span>
+                        <strong>3 / 15</strong>
+                    </div>
+                    <div class="info-row">
+                        <span>السعر بالساعة:</span>
+                        <strong>6 ريال</strong>
+                    </div>
+                    <div class="info-row">
+                        <span>المسافة:</span>
+                        <strong>1.2 كم</strong>
+                    </div>
+                </div>
+                
+                <div class="availability-bar">
+                    <div class="availability-fill" style="width: 20%;">20%</div>
+                </div>
+                
+                <div class="distance">📍 الموقع: حي الورود - الرياض</div>
+                
+                <button class="book-btn" onclick="location.href='booking.html'">احجز الآن</button>
+            </div>
+            
+            <!-- مول الفرسان -->
+            <div class="parking-card">
+                <div class="parking-card-header">
+                    <h3>🏬 مول الفرسان</h3>
+                    <span class="status-badge full">ممتلئ</span>
+                </div>
+                
+                <div class="parking-info">
+                    <div class="info-row">
+                        <span>المواقف المتاحة:</span>
+                        <strong>0 / 10</strong>
+                    </div>
+                    <div class="info-row">
+                        <span>السعر بالساعة:</span>
+                        <strong>7 ريال</strong>
+                    </div>
+                    <div class="info-row">
+                        <span>المسافة:</span>
+                        <strong>3.8 كم</strong>
+                    </div>
+                </div>
+                
+                <div class="availability-bar">
+                    <div class="availability-fill" style="width: 0%;">0%</div>
+                </div>
+                
+                <div class="distance">📍 الموقع: شارع الرياض - الرياض</div>
+                
+                <button class="book-btn" disabled style="background-color: #6B7280; cursor: not-allowed;">ممتلئ</button>
+            </div>
+            
+            <!-- الفرع الثاني -->
+            <div class="parking-card">
+                <div class="parking-card-header">
+                    <h3>🏢 الفرع الثاني</h3>
+                    <span class="status-badge available">متاح</span>
+                </div>
+                
+                <div class="parking-info">
+                    <div class="info-row">
+                        <span>المواقف المتاحة:</span>
+                        <strong>18 / 25</strong>
+                    </div>
+                    <div class="info-row">
+                        <span>السعر بالساعة:</span>
+                        <strong>4 ريال</strong>
+                    </div>
+                    <div class="info-row">
+                        <span>المسافة:</span>
+                        <strong>4.2 كم</strong>
+                    </div>
+                </div>
+                
+                <div class="availability-bar">
+                    <div class="availability-fill" style="width: 72%;">72%</div>
+                </div>
+                
+                <div class="distance">📍 الموقع: حي الملقا - الرياض</div>
+                
+                <button class="book-btn" onclick="location.href='booking.html'">احجز الآن</button>
+            </div>
+            
+            <!-- المستشفى التخصصي -->
+            <div class="parking-card">
+                <div class="parking-card-header">
+                    <h3>🏥 المستشفى التخصصي</h3>
+                    <span class="status-badge available">متاح</span>
+                </div>
+                
+                <div class="parking-info">
+                    <div class="info-row">
+                        <span>المواقف المتاحة:</span>
+                        <strong>9 / 16</strong>
+                    </div>
+                    <div class="info-row">
+                        <span>السعر بالساعة:</span>
+                        <strong>3 ريال</strong>
+                    </div>
+                    <div class="info-row">
+                        <span>المسافة:</span>
+                        <strong>1.8 كم</strong>
+                    </div>
+                </div>
+                
+                <div class="availability-bar">
+                    <div class="availability-fill" style="width: 56%;">56%</div>
+                </div>
+                
+                <div class="distance">📍 الموقع: حي السويدي - الرياض</div>
+                
+                <button class="book-btn" onclick="location.href='booking.html'">احجز الآن</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

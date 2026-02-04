@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>دردشة الدعم - Parking Point</title>
+  <style>
+    body{background:#19223A;color:#fff;font-family:'Cairo',sans-serif;margin:0;display:flex;flex-direction:column;min-height:100vh}
+    .header{background:#0F1820;padding:16px;display:flex;align-items:center;justify-content:space-between;border-bottom:2px solid #FFD600}
+    .header h1{color:#FFD600;font-size:20px}
+    .back{background:#FFD600;color:#19223A;padding:8px 14px;border-radius:8px;text-decoration:none;font-weight:700}
+    .chat{flex:1;display:flex;flex-direction:column;padding:16px;gap:12px;overflow:hidden}
+    .messages{flex:1;overflow:auto;padding:8px;display:flex;flex-direction:column;gap:12px}
+    .msg{max-width:75%;padding:10px 14px;border-radius:12px;line-height:1.4}
+    .msg.user{align-self:flex-end;background:#FFD600;color:#19223A}
+    .msg.staff{align-self:flex-start;background:#0F1820;border:1px solid #1A4A8A}
+    .input-area{display:flex;gap:8px;padding:12px;background:#0F1820;border-top:1px solid #1A4A8A}
+    .input-area input{flex:1;padding:12px;border-radius:8px;border:1px solid #1A4A8A;background:#19223A;color:#fff}
+    .input-area button{background:#FFD600;border:none;color:#19223A;padding:10px 16px;border-radius:8px;font-weight:700}
+    .meta{font-size:12px;color:#F3F4F6;opacity:0.85;margin-bottom:8px}
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>دعم العملاء</h1>
+    <a class="back" href="index.html">← العودة</a>
+  </div>
+  <div class="chat">
+    <div class="meta">هذه الدردشة محليًا لا تتطلب اتصال؛ لعرض الدردشة من جانب الموظف افتح <a style="color:#FFD600;text-decoration:none;font-weight:700" href="staff.html">صفحة الموظف</a></div>
+    <div id="messages" class="messages"></div>
+    <div class="input-area">
+      <input id="input" placeholder="اكتب رسالتك هنا..." />
+      <button onclick="send()">إرسال</button>
+    </div>
+  </div>
+
+  <script>
+    // محاكاة دردشة بسيطة مشتركة عبر localStorage (مفيدة للمعاينة المحلية)
+    const KEY = 'pp_support_chat';
+    function load(){
+      const raw = localStorage.getItem(KEY);
+      return raw? JSON.parse(raw): [];
+    }
+    function save(messages){ localStorage.setItem(KEY, JSON.stringify(messages)); }
+    function render(){
+      const messages = load();
+      const container = document.getElementById('messages');
+      container.innerHTML='';
+      messages.forEach(m=>{
+        const d = document.createElement('div');
+        d.className = 'msg '+(m.sender==='user'?'user':'staff');
+        d.innerHTML = m.text + '\n<div style="font-size:11px;color:rgba(255,255,255,0.6);margin-top:6px;">'+(new Date(m.time)).toLocaleString()+'</div>';
+        container.appendChild(d);
+      });
+      container.scrollTop = container.scrollHeight;
+    }
+    function send(){
+      const input = document.getElementById('input');
+      const text = input.value.trim();
+      if(!text) return; input.value='';
+      const messages = load();
+      messages.push({sender:'user',text,text, time: Date.now()});
+      save(messages); render();
+    }
+    // طلب إذن الإشعارات عند التحميل
+    if ('Notification' in window) {
+      if (Notification.permission === 'default') Notification.requestPermission();
+    }
+
+    // قيمة عدد الرسائل الأخيرة للمقارنة
+    let lastCount = load().length;
+
+    // دالة لإظهار إشعار داخل الصفحة (toast) عند الحاجة
+    function showToast(text){
+      let t = document.getElementById('pp_toast');
+      if(!t){ t = document.createElement('div'); t.id='pp_toast'; t.style= 'position:fixed;left:50%;transform:translateX(-50%);bottom:90px;background:rgba(0,0,0,0.6);color:#fff;padding:10px 16px;border-radius:8px;z-index:9999;'; document.body.appendChild(t);} 
+      t.innerText = text; t.style.display='block'; setTimeout(()=>{ t.style.display='none'; },4000);
+    }
+
+    function notify(title, body){
+      // إشعار المتصفح إن سمح المستخدم
+      if ('Notification' in window && Notification.permission === 'granted'){
+        try{ new Notification(title, { body }); }catch(e){}
+      } else {
+        showToast(title + ' - ' + body);
+      }
+    }
+
+    function checkForNew(){
+      const messages = load();
+      if (messages.length > lastCount){
+        const newMsgs = messages.slice(lastCount);
+        // إن وجد رسالة من الموظف، نعلم المستخدم
+        const staffMsg = newMsgs.find(m => m.sender === 'staff');
+        if (staffMsg){
+          notify('رسالة جديدة من دعم Parking Point', staffMsg.text);
+        }
+        lastCount = messages.length;
+      }
+      render();
+    }
+
+    // تحديث كل دقيقة كما طلبت
+    setInterval(checkForNew, 60000);
+
+    // الاستماع لتغير localStorage من تبويب آخر لتحديث فوري
+    window.addEventListener('storage', (e)=>{
+      if (e.key === KEY) checkForNew();
+    });
+
+    // تشغيل أولي
+    checkForNew();
+  </script>
+</body>
+</html>

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>واجهة الموظف - Parking Point</title>
+  <style>
+    body{background:#19223A;color:#fff;font-family:'Cairo',sans-serif;margin:0;display:flex;flex-direction:column;min-height:100vh}
+    .header{background:#0F1820;padding:16px;display:flex;align-items:center;justify-content:space-between;border-bottom:2px solid #FFD600}
+    .header h1{color:#FFD600;font-size:20px}
+    .back{background:#FFD600;color:#19223A;padding:8px 14px;border-radius:8px;text-decoration:none;font-weight:700}
+    .wrap{display:flex;gap:16px;padding:16px}
+    .panel{flex:1;background:#0F1820;border:1px solid #1A4A8A;padding:12px;border-radius:10px}
+    .messages{height:60vh;overflow:auto;display:flex;flex-direction:column;gap:10px;padding:8px}
+    .msg{max-width:80%;padding:10px 14px;border-radius:12px}
+    .msg.user{align-self:flex-end;background:#FFD600;color:#19223A}
+    .msg.staff{align-self:flex-start;background:#0F1820;border:1px solid #1A4A8A}
+    .input{display:flex;gap:8px;margin-top:8px}
+    .input input{flex:1;padding:10px;border-radius:8px;border:1px solid #1A4A8A;background:#19223A;color:#fff}
+    .input button{background:#10B981;border:none;color:#fff;padding:10px 14px;border-radius:8px}
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>لوحة الموظف - دردشة العملاء</h1>
+    <a class="back" href="index.html">← العودة</a>
+  </div>
+  <div class="wrap">
+    <div class="panel">
+      <div style="color:#F3F4F6;margin-bottom:8px">الرسائل الحالية (مشتركة عبر localStorage)</div>
+      <div id="msgs" class="messages"></div>
+      <div class="input">
+        <input id="reply" placeholder="اكتب رد الموظف..." />
+        <button onclick="reply()">ارسل كالموظف</button>
+      </div>
+    </div>
+    <div class="panel">
+      <h3 style="color:#FFD600;margin-bottom:8px">نصائح للموظف</h3>
+      <p style="color:#F3F4F6;font-size:14px;line-height:1.6">استخدم هذه الصفحة للرد على استفسارات العملاء محليًا أثناء المعاينة. الرسائل محفوظة في جهازك فقط (localStorage).</p>
+    </div>
+  </div>
+
+  <script>
+    const KEY='pp_support_chat';
+    function load(){const r=localStorage.getItem(KEY);return r?JSON.parse(r):[]}
+    function save(m){localStorage.setItem(KEY,JSON.stringify(m))}
+    function render(){const arr=load();const c=document.getElementById('msgs');c.innerHTML='';arr.forEach(m=>{const d=document.createElement('div');d.className='msg '+(m.sender==='user'?'user':'staff');d.innerHTML=m.text+'<div style="font-size:11px;color:rgba(255,255,255,0.6);margin-top:6px;">'+(new Date(m.time)).toLocaleString()+'</div>';c.appendChild(d)});c.scrollTop=c.scrollHeight}
+    function reply(){const t=document.getElementById('reply');const text=t.value.trim();if(!text) return;const arr=load();arr.push({sender:'staff',text,time:Date.now()});save(arr);t.value='';render()}
+    // طلب إذن الإشعارات
+    if ('Notification' in window) {
+      if (Notification.permission === 'default') Notification.requestPermission();
+    }
+
+    // تتبع عدد الرسائل الأخيرة
+    let lastCountStaff = load().length;
+
+    function showToast(text){
+      let t = document.getElementById('pp_toast');
+      if(!t){ t = document.createElement('div'); t.id='pp_toast'; t.style= 'position:fixed;left:50%;transform:translateX(-50%);bottom:90px;background:rgba(0,0,0,0.6);color:#fff;padding:10px 16px;border-radius:8px;z-index:9999;'; document.body.appendChild(t);} 
+      t.innerText = text; t.style.display='block'; setTimeout(()=>{ t.style.display='none'; },4000);
+    }
+
+    function notify(title, body){
+      if ('Notification' in window && Notification.permission === 'granted'){
+        try{ new Notification(title, { body }); }catch(e){}
+      } else {
+        showToast(title + ' - ' + body);
+      }
+    }
+
+    function checkForNewStaff(){
+      const arr = load();
+      if (arr.length > lastCountStaff){
+        const newMsgs = arr.slice(lastCountStaff);
+        const userMsg = newMsgs.find(m => m.sender === 'user');
+        if (userMsg){
+          notify('استفسار جديد من مستخدم', userMsg.text);
+        }
+        lastCountStaff = arr.length;
+      }
+      render();
+    }
+
+    // تحديث كل دقيقة
+    setInterval(checkForNewStaff, 60000);
+
+    // الاستماع لتغير localStorage لتحديث فوري
+    window.addEventListener('storage', (e)=>{
+      if (e.key === KEY) checkForNewStaff();
+    });
+
+    // تنفيذ أولي
+    checkForNewStaff();
+  </script>
+</body>
+</html>
